@@ -19,7 +19,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "pitt.drip",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",

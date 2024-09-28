@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "766697609837",
+    "project_id": "pitt-drip",
+    "storage_bucket": "pitt-drip.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766697609837:android:0c75c447d573e55f7e3d64",
+        "android_client_info": {
+          "package_name": "pitt.drip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLbfJsWMNWnm_J9iphX5OHRPeIUJmYUMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
