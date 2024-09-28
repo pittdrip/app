@@ -44,7 +44,7 @@ export default function HomeScreen() {
 
       <Link href="/home" asChild>
         <Pressable style={styles.pickOutfitButton}>
-          <Text style={styles.buttonText}>Pick me an outfit</Text>
+          <Text style={styles.buttonText}>Pick me an outfit!</Text>
         </Pressable>
       </Link>
     </View>
