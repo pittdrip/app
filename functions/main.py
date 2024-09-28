@@ -42,6 +42,8 @@ response = requests.get(output)
 img = Image.open(BytesIO(response.content))
 stuff = base64.b64encode(img.tobytes())
 print(stuff)
+data = f"data:application/octet-stream;base64,{stuff}"
+print(data)
 '''
 # initialize_app() qs
 #
