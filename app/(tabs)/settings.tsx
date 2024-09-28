@@ -21,8 +21,6 @@ const Settings = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Settings</Text>
-
             {user && user.email && (
                 <View style={styles.emailContainer}>
                     <Text style={styles.emailLabel}>Logged in as:</Text>
@@ -70,11 +68,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#1f2937',
     },
-    title: {
-        fontSize: 40,
-        fontWeight: '800',
-        marginBottom: 20,
-    },
     button: {
         backgroundColor: '#15803D',
         padding: 10,
@@ -83,54 +76,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
     },
-    deleteButton: {
-        backgroundColor: '#bc2f2f',
-    },
-    cancelButton: {
-        backgroundColor: '#6b7280',
-    },
     buttonText: {
         color: 'white',
         fontSize: 18,
         fontWeight: '500'
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-    input: {
-        height: 40,
-        width: 200,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: 10,
-        width: '50%'
     },
 });
 
