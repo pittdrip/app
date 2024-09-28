@@ -4,7 +4,18 @@
 
 from firebase_functions import https_fn
 from firebase_admin import initialize_app
+import replicate
 
+
+input = {
+    "image": "https://replicate.delivery/pbxt/JWsRA6DxCK24PlMYK5ENFYAFxJGUQTLr0JmLwsLb8uhv1JTU/shoe.jpg"
+}
+
+output = replicate.run(
+    "lucataco/remove-bg:95fcc2a26d3899cd6c2691c900465aaeff466285a65c14638cc5f36f34befaf1",
+    input=input
+)
+print(output)
 # initialize_app()
 #
 #
