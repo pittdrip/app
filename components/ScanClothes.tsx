@@ -2,7 +2,10 @@ import { Text, View } from "@/components/Themed"
 import { CameraView, CameraType, Camera, useCameraPermissions, CameraProps } from "expo-camera"
 import { Button, StyleSheet, TouchableOpacity } from "react-native"
 import { useRef, useState } from "react"
+import { toByteArray } from "react-native-quick-base64"
 
+import uuid from 'react-native-uuid';
+import { model } from "@/firebaseConfig"
 const ScanClothes = () => {
   const [facing, setFacing] = useState<CameraType>("back")
 
@@ -28,6 +31,8 @@ const ScanClothes = () => {
     setFacing(curr => (curr === "back" ? "front" : "back"))
   }
 
+
+
   const scan = async () => {
     if (!cameraReady) return
 
@@ -36,6 +41,18 @@ const ScanClothes = () => {
     })
 
     const b64 = image?.base64;
+
+    const imageData = {
+      inlineData: {
+        data: b64, mimeType: "image/jpg"
+      }
+    }
+
+    const prompt = "What do you see?"
+
+    const result = await model.generateContent([prompt, imageData])
+    console.log(result.response.text())
+
 
   }
   return (
