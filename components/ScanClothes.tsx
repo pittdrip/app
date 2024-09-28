@@ -1,95 +1,135 @@
-import { Text, View } from "@/components/Themed"
-import { CameraView, CameraType, Camera, useCameraPermissions, CameraProps } from "expo-camera"
-import { Button, StyleSheet, TouchableOpacity } from "react-native"
-import { useRef, useState } from "react"
-import { toByteArray } from "react-native-quick-base64"
+import React, { useRef, useState } from "react";
+import { Text, View } from "@/components/Themed";
+import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { Button, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import uuid from 'react-native-uuid';
-import { model } from "@/firebaseConfig"
+import { model } from "@/firebaseConfig";
+
+const { width, height } = Dimensions.get('window');
+
 const ScanClothes = () => {
-  const [facing, setFacing] = useState<CameraType>("back")
-
-  const [permission, requestPermission] = useCameraPermissions()
-
-  const [cameraReady, setCameraReady] = useState<boolean>(false)
-  const camera = useRef<CameraView | null>(null)
-
-
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [permission, requestPermission] = useCameraPermissions();
+  const [cameraReady, setCameraReady] = useState<boolean>(false);
+  const camera = useRef<CameraView | null>(null);
 
   if (!permission) {
-    return <View />
+    return <View />;
   }
 
   if (!permission.granted) {
-    <View style={styles.container}>
-      <Text style={styles.message}>We need your permission to show the camera</Text>
-      <Button onPress={requestPermission} title="grant permission" />
-    </View>
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.permissionContainer}>
+          <Text style={styles.message}>We need your permission to use the camera</Text>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+            <Text style={styles.buttonText}>Grant Permission</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   const toggleFacing = () => {
-    setFacing(curr => (curr === "back" ? "front" : "back"))
+    setFacing(curr => (curr === "back" ? "front" : "back"));
   }
 
-
-
   const scan = async () => {
-    if (!cameraReady) return
+    if (!cameraReady) return;
 
     const image = await camera.current?.takePictureAsync({
       base64: true
-    })
+    });
 
     const b64 = image?.base64;
 
     const imageData = {
       inlineData: {
-        data: b64, mimeType: "image/jpg"
+        data: b64,
+        mimeType: "image/jpg"
       }
-    }
+    };
 
-    const prompt = "What do you see?"
+    const prompt = "What do you see?";
 
-    const result = await model.generateContent([prompt, imageData])
-    console.log(result.response.text())
-
-
+    //@ts-ignore
+    const result = await model.generateContent([prompt, imageData]);
+    console.log(result.response.text());
   }
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CameraView style={styles.camera} facing={facing} onCameraReady={() => setCameraReady(true)} ref={camera}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleFacing}>
-            <Text>Flip Camera</Text>
+        <View style={styles.overlay}>
+          <TouchableOpacity style={styles.flipButton} onPress={toggleFacing}>
+            <Ionicons name="camera-reverse" size={30} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={scan}>
-            <Text>
-              Scan
-            </Text>
+          <TouchableOpacity style={styles.scanButton} onPress={scan}>
+            <Ionicons name="scan" size={40} color="white" />
           </TouchableOpacity>
         </View>
       </CameraView>
-    </View>
-  )
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'black',
+  },
+  permissionContainer: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   message: {
-    textAlign: "center",
-    paddingBottom: 10
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: 'white',
+  },
+  permissionButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
   },
   camera: {
     flex: 1,
+    width: width,
+    height: height,
   },
-  buttonContainer: {
+  overlay: {
     flex: 1,
-    justifyContent: "center"
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
   },
-  button: {
-  }
-})
+  flipButton: {
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    marginTop: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    padding: 15,
+    borderRadius: 40,
+  },
+  scanButton: {
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    padding: 20,
+    borderRadius: 50,
+    marginBottom: 20,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
+
 export default ScanClothes;

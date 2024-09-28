@@ -3,18 +3,11 @@ import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import ScanClothes from '@/components/ScanClothes'; 
 
 export default function PlaceholderScreen() {
 
     return (
         <View style={styles.container}>
-            <StatusBar style="auto" />
-            <ScanClothes />
-            <Text style={styles.title}>Home</Text>
-            <Pressable onPress={() => router.push('../(misc)/settings')}>
-                <Ionicons name="cog-outline" size={36} color="gray" />
-            </Pressable>
         </View>
     );
 }
