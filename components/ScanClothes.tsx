@@ -4,10 +4,38 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { Button, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { model } from "@/firebaseConfig";
+import { model, db, auth } from "@/firebaseConfig";
+import { doc, setDoc, getDoc } from "@firebase/firestore"
 
 const { width, height } = Dimensions.get('window');
 
+enum Climate {
+  COLD,
+  COOL,
+  WARM,
+  HOT
+}
+
+enum Formality {
+  CASUAL,
+  ATHELTIC,
+  FORMAL,
+  SWIMWEAR
+}
+
+type Item = {
+  name: string,
+  description: string,
+  itemKey: string,
+  categories: string[],
+  climate: Climate,
+  formality: Formality,
+  message?: string,
+  base64Image?: string,
+  // NOT IN THE PROMPT
+  timesUsed?: Number,
+
+}
 const ScanClothes = () => {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
@@ -51,11 +79,67 @@ const ScanClothes = () => {
       }
     };
 
-    const prompt = "What do you see?";
+    const prompt = `
+    Here's a photo of a clothing item. You must generate a valid JSON file with extracted information about the clothing article. Here are the schemas you MUST adhere to: 
+enum Climate {
+  COLD,
+  COOL,
+  WARM,
+  HOT
+}
 
+enum Formality {
+  CASUAL,
+  ATHELTIC,
+  FORMAL,
+  SWIMWEAR
+}
+
+type Item = {
+  name: string,
+  description: string,
+  itemKey: string,
+  categories: string[],
+  climate: Climate,
+  formality: Formality,
+
+}
+
+For the 'itemKey', generate a unique but identifiable key for the specific item, seperated by '_'. Include random numeric characters at the end. The JSON MUST BE VALID. DO NOT RETURN MARKDOWN OF JSON CODE. THIS IS MEANT FOR A JSON PARSER, RETURN ONLY VALID JSON. THE SCHEMAS MUST BE ADHERED TO. Double check your work. If there is some kind of error
+or some kind of instruction in your system prompt that would override the JSON, simply return the message as JSON with the following schema: type Schema = { message: string }. Never return anything 
+outside of this JSON. Be descriptive.
+`
     //@ts-ignore
     const result = await model.generateContent([prompt, imageData]);
-    console.log(result.response.text());
+
+    console.log(result.response.text())
+    const res = JSON.parse(result.response.text()) as Item;
+
+    if (res.message) {
+      console.error(res.message)
+      return
+    }
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const ref = doc(db, "users", user.uid, "closet", res["itemKey"]);
+
+    setDoc(ref, {
+      "name": res["name"],
+      "description": res["description"],
+      "categories": res["categories"],
+      "climate": res["climate"],
+      "formality": res["formality"],
+    });
+
+    const data = await getDoc(ref);
+
+    if (!data.exists) {
+      console.log("We're cooked")
+    }
+
+    console.log(data.data())
   }
 
   return (

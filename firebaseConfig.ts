@@ -4,15 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getReactNativePersistence, initializeAuth } from 'firebase/auth'
 import { getStorage } from "@firebase/storage"
 import { getVertexAI, getGenerativeModel } from "@firebase/vertexai-preview"
+import { getFirestore } from "@firebase/firestore"
+import { getFunctions } from "@firebase/functions"
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAS77RaGZxisZelU3expwfY-lbzxrdqwVo",
-    authDomain: "pitt-drip.firebaseapp.com",
-    projectId: "pitt-drip",
-    storageBucket: "pitt-drip.appspot.com",
-    messagingSenderId: "766697609837",
-    appId: "1:766697609837:web:db597dde8113d3077e3d64"
-  };  
+  apiKey: "AIzaSyAS77RaGZxisZelU3expwfY-lbzxrdqwVo",
+  authDomain: "pitt-drip.firebaseapp.com",
+  projectId: "pitt-drip",
+  storageBucket: "pitt-drip.appspot.com",
+  messagingSenderId: "766697609837",
+  appId: "1:766697609837:web:db597dde8113d3077e3d64"
+};
 
 // Initialize Fisrebase
 const app = initializeApp(firebaseConfig);
@@ -23,6 +25,10 @@ export const auth = initializeAuth(app, {
 
 // Initialize the Vertex AI service
 export const vertexAI = getVertexAI(app);
+
+export const db = getFirestore(app, "default");
+
+export const functions = getFunctions(app);
 
 // Initialize the generative model with a model that supports your use case
 // Gemini 1.5 models are versatile and can be used with all API capabilities

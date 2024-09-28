@@ -3,7 +3,6 @@
 # Deploy with `firebase deploy`
 
 from firebase_functions import https_fn
-from firebase_admin import initialize_app
 import replicate
 import base64
 from io import BytesIO
