@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Text, View } from "@/components/Themed";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { Button, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { model, db, auth } from "@/firebaseConfig";
@@ -41,7 +41,7 @@ type Item = {
   climate: Climate,
   formality: Formality,
   message?: string,
-  base64Image?: string,
+  image?: string,
   // NOT IN THE PROMPT
   timesUsed?: Number,
 
@@ -81,6 +81,26 @@ const ScanClothes = () => {
     });
 
     const b64 = image?.base64;
+
+    let url;
+    try {
+      let backgroundRemovedBase64Res = await fetch("http://10.4.17.222:3000/removebg", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          base64Image: b64
+        })
+      })
+
+      url  = await backgroundRemovedBase64Res.json()
+
+    } catch (error) {
+      console.log(error)
+    }
+
 
     const imageData = {
       inlineData: {
@@ -151,6 +171,7 @@ outside of this JSON. Be descriptive.
       "categories": res["category"],
       "climate": res["climate"],
       "formality": res["formality"],
+      "image": url.url
     });
 
     const data = await getDoc(ref);
@@ -159,6 +180,7 @@ outside of this JSON. Be descriptive.
       console.log("We're cooked")
     }
 
+    Alert.alert(`Finished scanning ${res.name}`)
     console.log(data.data())
   }
 
