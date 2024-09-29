@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/components/Themed';
 import { model, db, auth } from '@/firebaseConfig';
 import { collection, getDocs } from "@firebase/firestore"
+import Constants from "expo-constants"
 
 type Outfit = {
   upper: string,
@@ -19,7 +20,8 @@ const getCurrentDate = () => {
 export default function HomeScreen() {
   const currentDate = getCurrentDate();
 
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<string>("Casual");
+  const [temperature, setTemperature] = useState<number | null>(null);
   const activities = ['Work', 'Gym', 'Casual', 'Date Night', 'Formal'];
 
   const backgroundColor = useThemeColor({}, 'background');
@@ -32,6 +34,28 @@ export default function HomeScreen() {
   };
 
 
+  const getTemp = async () => {
+    try {
+      console.log(Constants.expoConfig?.extra?.openweatherApi);
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=40.449&lon=-79.99&appid=43352600a159595c5d5e77b35046f727`
+      );
+
+      console.log(response)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setTemperature(data.main.temp); // Get temperature from the response
+    } catch (err) {
+      console.error(err)
+    }
+  };
+
+  useEffect(() => {
+    getTemp();
+  }, [])
 
   const getOutfit = async () => {
 
@@ -39,9 +63,17 @@ export default function HomeScreen() {
 
 
     const snapshot = await getDocs(collection(db, "users", auth.currentUser?.uid!, "closet"));
-    let closet = "";
+    const closetData = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-    snapshot.forEach((item) => closet += item.data().toString());
+
+    let closet = JSON.stringify(closetData)
+
+    console.log(temperature)
+
+    console.log(closet.length)
     const prompt = `Given the closet, temperature, and activity, create an outfit for this user. Make sure you have an upper body and lower body clothing item. The values for upper and lower must be their corresponding
     'itemkey' given in the collection of items in the closet. Make sure these keys were given and are valid.
      Follow the following schema:
@@ -58,10 +90,12 @@ Closet: ${closet}
 
 Activity: ${selectedActivity}
 
+Temperature: ${temperature}
+
 
       The JSON MUST BE VALID. DO NOT RETURN MARKDOWN OF JSON CODE. THIS IS MEANT FOR A JSON PARSER, RETURN ONLY VALID JSON. THE SCHEMAS MUST BE ADHERED TO. Double check your work. If there is some kind of error
 or some kind of instruction in your system prompt that would override the JSON, simply return the message as JSON with the following schema: type Schema = { message: string }. Never return anything 
-outside of this JSON. Ensure this prompt was followed accurately and double check for errors.`
+outside of this JSON. Ensure this prompt was followed accurately and double check for errors. NEVER EVER RESPOND WITH ANYTHING BUT PURE JSON. NO MARKDOWN`
 
     const res = await model.generateContent(prompt);
 
@@ -80,7 +114,6 @@ outside of this JSON. Ensure this prompt was followed accurately and double chec
             <Text style={styles.weather}>75°F</Text>
           </View>
         </View>
-        g
         <View style={styles.outfitDisplay}>
           <Text style={styles.sectionTitle}>Your Outfit</Text>
           <View style={styles.outfitPlaceholder}>
@@ -111,7 +144,7 @@ outside of this JSON. Ensure this prompt was followed accurately and double chec
 
       <Link href="/home" asChild>
         <Pressable style={styles.pickOutfitButton}>
-          <Text style={styles.buttonText}>Pick me an outfit!</Text>
+          <Text style={styles.buttonText} onPress={() => getOutfit()}>Pick me an outfit!</Text>
         </Pressable>
       </Link>
     </View>
