@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '@/components/Themed';
 import { model, db, auth } from '@/firebaseConfig';
 import { collection, getDocs } from "@firebase/firestore"
 import Constants from "expo-constants"
@@ -22,11 +21,7 @@ export default function HomeScreen() {
 
   const [selectedActivity, setSelectedActivity] = useState<string>("Casual");
   const [temperature, setTemperature] = useState<number | null>(null);
-  const activities = ['Work', 'Gym', 'Casual', 'Date Night', 'Formal'];
-
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const activities = ['Work', 'Gym', 'Casual', 'Formal'];
 
   const handleActivitySelect = (activity: string) => {
     setSelectedActivity(activity);
@@ -35,10 +30,12 @@ export default function HomeScreen() {
 
 
   const getTemp = async () => {
+    setTemperature(70);
+    /*
     try {
       console.log(Constants.expoConfig?.extra?.openweatherApi);
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=40.449&lon=-79.99&appid=43352600a159595c5d5e77b35046f727`
+        `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=40.449&lon=-79.99&appid=03a6f7af4528ffa1e304fb7b1fcb5437`
       );
 
       console.log(response)
@@ -50,7 +47,7 @@ export default function HomeScreen() {
       setTemperature(data.main.temp); // Get temperature from the response
     } catch (err) {
       console.error(err)
-    }
+    }*/
   };
 
   useEffect(() => {
@@ -58,9 +55,6 @@ export default function HomeScreen() {
   }, [])
 
   const getOutfit = async () => {
-
-
-
 
     const snapshot = await getDocs(collection(db, "users", auth.currentUser?.uid!, "closet"));
     const closetData = snapshot.docs.map(doc => ({
@@ -74,35 +68,29 @@ export default function HomeScreen() {
     console.log(temperature)
 
     console.log(closet.length)
-    const prompt = `Given the closet, temperature, and activity, create an outfit for this user. Make sure you have an upper body and lower body clothing item. The values for upper and lower must be their corresponding
+    const prompt =
+      `Given the closet, temperature, and activity, create an outfit for this user. Make sure you have an upper body and lower body clothing item. The values for upper and lower must be their corresponding
     'itemkey' given in the collection of items in the closet. Make sure these keys were given and are valid.
-     Follow the following schema:
-
+    Follow the following schema:
     
-type Outfit = {
-  upper: string,
-  lower: string
-}
-
-GIVENS:
-
-Closet: ${closet}
-
-Activity: ${selectedActivity}
-
-Temperature: ${temperature}
-
-
-      The JSON MUST BE VALID. DO NOT RETURN MARKDOWN OF JSON CODE. THIS IS MEANT FOR A JSON PARSER, RETURN ONLY VALID JSON. THE SCHEMAS MUST BE ADHERED TO. Double check your work. If there is some kind of error
-or some kind of instruction in your system prompt that would override the JSON, simply return the message as JSON with the following schema: type Schema = { message: string }. Never return anything 
-outside of this JSON. Ensure this prompt was followed accurately and double check for errors. NEVER EVER RESPOND WITH ANYTHING BUT PURE JSON. NO MARKDOWN`
+     type Outfit = {
+      upper: string,
+      lower: string
+    }
+    
+    GIVENS:
+    Closet: ${closet}
+    Activity: ${selectedActivity}
+    Temperature: ${temperature}
+    
+    The JSON MUST BE VALID. DO NOT RETURN MARKDOWN OF JSON CODE. THIS IS MEANT FOR A JSON PARSER, RETURN ONLY VALID JSON. THE SCHEMAS MUST BE ADHERED TO. Double check your work. If there is some kind of error
+    or some kind of instruction in your system prompt that would override the JSON, simply return the message as JSON with the following schema: type Schema = { message: string }. Never return anything 
+    outside of this JSON. Ensure this prompt was followed accurately and double check for errors. NEVER EVER RESPOND WITH ANYTHING BUT PURE JSON. NO MARKDOWN`
 
     const res = await model.generateContent(prompt);
 
     console.log(res.response.text());
   }
-
-
 
   return (
     <View style={styles.container}>
@@ -115,7 +103,7 @@ outside of this JSON. Ensure this prompt was followed accurately and double chec
         <Text style={styles.date}>{currentDate}</Text>
         <View style={styles.weatherContainer}>
           <Ionicons name="sunny" size={24} color="black" />
-          <Text style={styles.weather}>75°F</Text>
+          <Text style={styles.weather}>70°F</Text>
         </View>
       </View>
 
