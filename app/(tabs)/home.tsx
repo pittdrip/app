@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { model, db, auth } from '@/firebaseConfig';
-import { collection, getDocs } from "@firebase/firestore"
+import {collection, doc, getDoc, getDocs} from "@firebase/firestore"
 import Constants from "expo-constants"
 
 type Outfit = {
@@ -21,6 +21,9 @@ export default function HomeScreen() {
 
   const [selectedActivity, setSelectedActivity] = useState<string>("Casual");
   const [temperature, setTemperature] = useState<number | null>(null);
+  const roc = "https://replicate.delivery/czjl/UsKeEgyexhhyj0MDUdITQgoAIgLqHtceZhR8SKoT3ITIepGOB/output.png"
+  const modelGuy = "https://replicate.delivery/pbxt/KgwTlhCMvDagRrcVzZJbuozNJ8esPqiNAIJS3eMgHrYuHmW4/KakaoTalk_Photo_2024-04-04-21-44-45.png"
+  const [manequin, setManequin] = useState<string>(roc);
   const activities = ['Work', 'Gym', 'Casual', 'Formal'];
 
   const handleActivitySelect = (activity: string) => {
@@ -89,7 +92,64 @@ export default function HomeScreen() {
 
     const res = await model.generateContent(prompt);
 
-    console.log(res.response.text());
+    console.log(res.response.text())
+
+    const { upper, lower } = JSON.parse(res.response.text()) as { upper: string, lower: string}
+
+    const ref = doc(db, "users", auth.currentUser!.uid,"closet", upper)
+
+    const upperDoc = (await getDoc(ref)).data();
+
+    let upperRocUrl
+    try {
+      let upperRoc = await fetch("http://10.4.17.222:3000/dress", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          human_img: roc,
+          garm_img: upperDoc?.image,
+          garment_desc: upperDoc?.description,
+          category: "upper_body"
+        })
+      })
+
+       upperRocUrl = (await upperRoc.json()).url;
+
+    } catch (error) {
+      console.log(error)
+    }
+
+    let lowerDoc = (await getDoc(doc(db, "users", auth.currentUser!.uid, "closet", lower))).data();
+
+    let lowerRocUrl
+    try {
+      let upperRoc = await fetch("http://10.4.17.222:3000/dress", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          human_img: upperRocUrl,
+          garm_img: lowerDoc?.image,
+          garment_desc: lowerDoc?.description,
+          category: "lower_body"
+        })
+      })
+
+      upperRocUrl = (await upperRoc.json()).url;
+
+      setManequin(upperRocUrl)
+
+      console.log(manequin)
+
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   return (
@@ -110,7 +170,7 @@ export default function HomeScreen() {
       <View style={styles.outfitDisplay}>
         <Text style={styles.sectionTitle}>Your Outfit</Text>
         <View style={styles.outfitPlaceholder}>
-          <Text>Outfit Image Placeholder</Text>
+          <Image source={{ uri: manequin! }} style={styles.manequin}/>
         </View>
       </View>
 
@@ -136,7 +196,7 @@ export default function HomeScreen() {
 
       <Link href="/home" asChild>
         <Pressable style={styles.pickOutfitButton}>
-          <Text style={styles.buttonText}>Pick my outfit!</Text>
+          <Text style={styles.buttonText} onPress={() => getOutfit()}>Pick my outfit!</Text>
         </Pressable>
       </Link>
     </View>
@@ -147,6 +207,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
+  },
+  manequin: {
+    height: '100%',
+    width: '100%',
+    resizeMode: 'cover'
   },
   logoContainer: {
     flexDirection: 'row',
