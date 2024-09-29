@@ -56,12 +56,17 @@ app.post("/dress", async (req, res) => {
   const { garm_img_b64, garment_desc, human_img_b64 } = req.body;
 
 
-  const garm_img_data = `data;${mime};base64;${garm_img_b64}`
-  const human_img_data = `data;${mime};base64;${human_img_b64}`
+  let garm_buff = Buffer.from(garm_img_b64, 'base64');
+  fs.writeFileSync('garm_image.jpg', garm_buff);
+
+
+  let human_buff = Buffer.from(human_img_b64, 'base64');
+
+  fs.writeFileSync('human_image.jpg', human_buff);
 
   const input = {
-    garm_img: garm_img_data,
-    human_img_data: human_img_data,
+    garm_img: await readFile("garm_image.jpg"),
+    human_img_data: await readFile("human_image.jpg"),
     garment_des: garment_desc
   };
 
@@ -72,6 +77,10 @@ app.post("/dress", async (req, res) => {
       message: "We're cooked"
     })
   }
+
+  fs.rmSync("garm_image.jpg");
+
+  fs.rmSync("human_image.jpg");
 
   let image = await axios.get(output, { responseType: "blob" });
 
