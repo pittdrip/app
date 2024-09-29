@@ -82,9 +82,11 @@ app.post("/dress", async (req, res) => {
 
   fs.rmSync("human_image.jpg");
 
-  let image = await axios.get(output, { responseType: "blob" });
+  // let image = await axios.get(output, { responseType: "blob" });
 
-  return res.send(image);
+  return res.json({
+    url: output
+  });
 })
 
 app.listen(3000, () => {
