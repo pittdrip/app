@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
     },
     buttonPressed: {
-        backgroundColor: '#166534',
+        backgroundColor: '#012975',
     },
     buttonText: {
         color: '#FFB81C',
