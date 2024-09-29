@@ -84,7 +84,7 @@ const ScanClothes = () => {
 
     let url;
     try {
-      let backgroundRemovedBase64Res = await fetch("http://10.4.17.222:3000/removebg", {
+      let backgroundRemovedBase64Res = await fetch("http://10.4.117.195:3000/removebg", {
         method: "POST",
         headers: {
           'Accept': 'application/json',

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, Pressable, FlatList } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Pressable, FlatList, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ type ClothingItem = {
   description?: string;
   climate?: string;
   formality?: string;
+  image?: string;
 };
 
 const categories = ['JACKET', 'SHOES', 'SHIRT', 'PANTS', 'SHORTS', 'SWEATSHIRT', 'OTHER'];
@@ -23,23 +24,18 @@ export default function ClosetScreen() {
   const fetchClothingItems = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
-      console.log("No user logged in");
       return;
     }
-
-    console.log("Fetching clothing items for user:", user.uid);
 
     const closetRef = collection(db, 'users', user.uid, 'closet');
     const q = query(closetRef);
     
     try {
       const querySnapshot = await getDocs(q);
-      console.log("Number of documents retrieved:", querySnapshot.size);
 
       const items: ClothingItem[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        console.log("Document data:", data);
         items.push({
           id: doc.id,
           name: data.name || 'Unnamed Item',
@@ -47,10 +43,11 @@ export default function ClosetScreen() {
           description: data.description,
           climate: data.climate,
           formality: data.formality,
+          image: data.image,
         });
       });
 
-      console.log("Processed items:", items);
+
       setClothingItems(items);
     } catch (error) {
       console.error("Error fetching clothing items:", error);
@@ -64,13 +61,7 @@ export default function ClosetScreen() {
   );
 
   const handleItemClick = (item: ClothingItem) => {
-    console.log('Item clicked:', item);
-    console.log('Item details:');
-    console.log('- Name:', item.name);
-    console.log('- Category:', item.category);
-    console.log('- Description:', item.description || 'No description');
-    console.log('- Climate:', item.climate || 'Not specified');
-    console.log('- Formality:', item.formality || 'Not specified');
+
   };
 
   const renderClothingItem = ({ item }: { item: ClothingItem }) => (
@@ -78,13 +69,18 @@ export default function ClosetScreen() {
       style={styles.clothingItem}
       onPress={() => handleItemClick(item)}
     >
-      <Text style={styles.clothingItemText}>{item.name}</Text>
+      {item.image ? (
+        <Image source={{ uri: item.image }} style={styles.clothingItemImage} />
+      ) : (
+        <View style={styles.clothingItemPlaceholder}>
+          <Text style={styles.clothingItemText}>{item.name}</Text>
+        </View>
+      )}
     </Pressable>
   );
 
   const renderCategory = (category: string) => {
     const categoryItems = clothingItems.filter((item) => item.category === category);
-    console.log(`Rendering category ${category} with ${categoryItems.length} items`);
 
     return (
       <View style={styles.categoryContainer} key={category}>
@@ -115,11 +111,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   categoriesContainer: {
     flex: 1,
   },
@@ -138,19 +129,24 @@ const styles = StyleSheet.create({
   clothingItem: {
     width: 100,
     height: 100,
+    marginRight: 10,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  clothingItemImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  clothingItemPlaceholder: {
+    width: '100%',
+    height: '100%',
     backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
-    borderRadius: 10,
   },
   clothingItemText: {
     textAlign: 'center',
     padding: 5,
-  },
-  addButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
   },
 });
