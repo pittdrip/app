@@ -23,11 +23,21 @@ enum Formality {
   SWIMWEAR
 }
 
+enum Category {
+  JACKET,
+  SHOES,
+  SHIRT,
+  PANTS,
+  SHORTS,
+  SWEATSHIRT,
+  OTHER
+}
+
 type Item = {
   name: string,
   description: string,
   itemKey: string,
-  categories: string[],
+  category: Category,
   climate: Climate,
   formality: Formality,
   message?: string,
@@ -88,6 +98,16 @@ enum Climate {
   HOT
 }
 
+enum Category {
+  JACKET,
+  SHOES,
+  SHIRT,
+  PANTS,
+  SHORTS,
+  SWEATSHIRT,
+  OTHER
+}
+
 enum Formality {
   CASUAL,
   ATHELTIC,
@@ -99,7 +119,7 @@ type Item = {
   name: string,
   description: string,
   itemKey: string,
-  categories: string[],
+  category: Category,
   climate: Climate,
   formality: Formality,
 
@@ -128,7 +148,7 @@ outside of this JSON. Be descriptive.
     setDoc(ref, {
       "name": res["name"],
       "description": res["description"],
-      "categories": res["categories"],
+      "categories": res["category"],
       "climate": res["climate"],
       "formality": res["formality"],
     });

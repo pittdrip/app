@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from '@/components/Themed';
 
 const getCurrentDate = () => {
   const date = new Date();
@@ -11,6 +12,18 @@ const getCurrentDate = () => {
 
 export default function HomeScreen() {
   const currentDate = getCurrentDate();
+  
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const activities = ['Work', 'Gym', 'Casual', 'Date Night', 'Formal'];
+
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const tintColor = useThemeColor({}, 'tint');
+  
+  const handleActivitySelect = (activity: string) => {
+    setSelectedActivity(activity);
+    console.log('Selected activity:', activity);
+  };
 
   return (
     <View style={styles.container}>
@@ -33,9 +46,18 @@ export default function HomeScreen() {
         <View style={styles.activitySelect}>
           <Text style={styles.sectionTitle}>Select Activity</Text>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.activityScroll}>
-            {['Work', 'Gym', 'Casual', 'Date Night', 'Formal'].map((activity, index) => (
-              <Pressable key={index} style={styles.activityItem}>
-                <Text>{activity}</Text>
+            {activities.map((activity, index) => (
+              <Pressable 
+                key={index} 
+                style={[
+                  styles.activityItem, 
+                  selectedActivity === activity && styles.selectedActivityItem
+                ]}
+                onPress={() => handleActivitySelect(activity)}
+              >
+                <Text style={selectedActivity === activity ? styles.selectedActivityText : styles.activityText}>
+                  {activity}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -67,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   date: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   weatherContainer: {
@@ -75,24 +97,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   weather: {
-    fontSize: 16,
+    fontSize: 18,
     marginLeft: 5,
   },
   outfitDisplay: {
     backgroundColor: '#fff',
-    margin: 10,
+    marginHorizontal: 10,
+    marginTop: 10,
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   outfitPlaceholder: {
     width: '100%',
-    height: 375,
+    height: 385,
     backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
@@ -103,6 +126,23 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
     padding: 10,
+    alignItems: "center"
+  },
+  selectedActivityDisplay: {
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  activityText: {
+    color: 'black',
+  },
+  selectedActivityItem: {
+    backgroundColor: 'green',
+  },
+  selectedActivityText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   activityScroll: {
     flexDirection: 'row',
@@ -121,7 +161,9 @@ const styles = StyleSheet.create({
     padding: 15,
     height: 50,
     borderRadius: 10,
-    margin: 10,
+    marginTop: 10,
+    marginHorizontal: 10,
+    marginBottom: 10,
     alignItems: 'center',
   },
   buttonText: {
