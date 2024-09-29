@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '@/components/Themed';
 
 const getCurrentDate = () => {
   const date = new Date();
@@ -12,14 +11,10 @@ const getCurrentDate = () => {
 
 export default function HomeScreen() {
   const currentDate = getCurrentDate();
-  
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-  const activities = ['Work', 'Gym', 'Casual', 'Date Night', 'Formal'];
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
-  
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const activities = ['Work', 'School', 'Gym', 'Casual', 'Formal'];
+
   const handleActivitySelect = (activity: string) => {
     setSelectedActivity(activity);
     console.log('Selected activity:', activity);
@@ -27,46 +22,49 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.date}>{currentDate}</Text>
-          <View style={styles.weatherContainer}>
-            <Ionicons name="sunny" size={24} color="black" />
-            <Text style={styles.weather}>75°F</Text>
-          </View>
-        </View>
+      <View style={styles.logoContainer}>
+        <Text style={styles.logoText}>Pitt</Text>
+        <Text style={[styles.logoText, styles.logoTextDrip]}>Drip</Text>
+      </View>
 
-        <View style={styles.outfitDisplay}>
-          <Text style={styles.sectionTitle}>Your Outfit</Text>
-          <View style={styles.outfitPlaceholder}>
-            <Text>Outfit Image Placeholder</Text>
-          </View>
+      <View style={styles.header}>
+        <Text style={styles.date}>{currentDate}</Text>
+        <View style={styles.weatherContainer}>
+          <Ionicons name="sunny" size={24} color="black" />
+          <Text style={styles.weather}>75°F</Text>
         </View>
+      </View>
 
-        <View style={styles.activitySelect}>
-          <Text style={styles.sectionTitle}>Select Activity</Text>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.activityScroll}>
-            {activities.map((activity, index) => (
-              <Pressable 
-                key={index} 
-                style={[
-                  styles.activityItem, 
-                  selectedActivity === activity && styles.selectedActivityItem
-                ]}
-                onPress={() => handleActivitySelect(activity)}
-              >
-                <Text style={selectedActivity === activity ? styles.selectedActivityText : styles.activityText}>
-                  {activity}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
+      <View style={styles.outfitDisplay}>
+        <Text style={styles.sectionTitle}>Your Outfit</Text>
+        <View style={styles.outfitPlaceholder}>
+          <Text>Outfit Image Placeholder</Text>
         </View>
-      </ScrollView>
+      </View>
+
+      <View style={styles.activitySelect}>
+        <Text style={styles.sectionTitle}>Select Activity</Text>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.activityScroll}>
+          {activities.map((activity, index) => (
+            <Pressable
+              key={index}
+              style={[
+                styles.activityItem,
+                selectedActivity === activity && styles.selectedActivityItem
+              ]}
+              onPress={() => handleActivitySelect(activity)}
+            >
+              <Text style={selectedActivity === activity ? styles.selectedActivityText : styles.activityText}>
+                {activity}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
 
       <Link href="/home" asChild>
         <Pressable style={styles.pickOutfitButton}>
-          <Text style={styles.buttonText}>Pick me an outfit!</Text>
+          <Text style={styles.buttonText}>Pick my outfit!</Text>
         </Pressable>
       </Link>
     </View>
@@ -78,18 +76,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
   },
-  scrollView: {
-    flex: 1,
+  logoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 30,
+    paddingBottom: 10,
+    backgroundColor: '#003594',
+  },
+  logoText: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#FFB81C',
+  },
+  logoTextDrip: {
+    color: '#FFFFFF',
+    marginLeft: 5,
   },
   header: {
-    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 20,
     backgroundColor: '#fff',
   },
   date: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   weatherContainer: {
@@ -102,10 +113,9 @@ const styles = StyleSheet.create({
   },
   outfitDisplay: {
     backgroundColor: '#fff',
-    marginHorizontal: 10,
-    marginTop: 10,
+    margin: 10,
     borderRadius: 10,
-    padding: 10,
+    padding: 20,
     alignItems: 'center',
   },
   sectionTitle: {
@@ -115,7 +125,7 @@ const styles = StyleSheet.create({
   },
   outfitPlaceholder: {
     width: '100%',
-    height: 385,
+    height: 350,
     backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
@@ -123,16 +133,11 @@ const styles = StyleSheet.create({
   },
   activitySelect: {
     backgroundColor: '#fff',
-    margin: 10,
+    marginHorizontal: 20,
+    marginBottom: 10,
     borderRadius: 10,
-    padding: 10,
+    padding: 20,
     alignItems: "center"
-  },
-  selectedActivityDisplay: {
-    textAlign: 'center',
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   activityText: {
     color: 'black',
@@ -157,18 +162,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   pickOutfitButton: {
-    backgroundColor: '#003594',
+    backgroundColor: '#FFB81C',
     padding: 15,
     height: 50,
     borderRadius: 10,
-    marginTop: 5,
-    marginHorizontal: 10,
-    marginBottom: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#FFB81C',
+    color: '#003594',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
 });

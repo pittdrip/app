@@ -1,9 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
-import { Link, Tabs } from 'expo-router';
-import { Pressable, View } from 'react-native';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { Tabs } from 'expo-router';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -13,12 +10,11 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#003594',
         tabBarShowLabel: false,
         tabBarStyle: {
           height: 60,
@@ -27,6 +23,7 @@ export default function TabLayout() {
           justifyContent: 'center',
           alignItems: 'center',
         },
+        headerShown: false,
       }}>
       <Tabs.Screen
         name="home"
@@ -40,20 +37,6 @@ export default function TabLayout() {
         options={{
           title: 'Closet',
           tabBarIcon: ({ color }) => <TabBarIcon name="tshirt" color={color} />,
-          headerRight: () => (
-            <Link href="/scan-modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="camera"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
         }}
       />
       <Tabs.Screen

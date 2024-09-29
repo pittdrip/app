@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, Pressable, FlatList, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Pressable, FlatList, Image, Modal, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '@/firebaseConfig';
 
 type ClothingItem = {
@@ -16,10 +16,11 @@ type ClothingItem = {
   image?: string;
 };
 
-const categories = ['JACKET', 'SHOES', 'SHIRT', 'PANTS', 'SHORTS', 'SWEATSHIRT', 'OTHER'];
+const categories = ['SHIRT', 'PANTS', 'SHORTS', 'SWEATSHIRT'];
 
 export default function ClosetScreen() {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
 
   const fetchClothingItems = useCallback(async () => {
     const user = auth.currentUser;
@@ -29,7 +30,7 @@ export default function ClosetScreen() {
 
     const closetRef = collection(db, 'users', user.uid, 'closet');
     const q = query(closetRef);
-    
+
     try {
       const querySnapshot = await getDocs(q);
 
@@ -39,14 +40,13 @@ export default function ClosetScreen() {
         items.push({
           id: doc.id,
           name: data.name || 'Unnamed Item',
-          category: data.categories || 'OTHER',
+          category: data.categories,
           description: data.description,
           climate: data.climate,
           formality: data.formality,
           image: data.image,
         });
       });
-
 
       setClothingItems(items);
     } catch (error) {
@@ -61,7 +61,35 @@ export default function ClosetScreen() {
   );
 
   const handleItemClick = (item: ClothingItem) => {
+    setSelectedItem(item);
+  };
 
+  const handleDeleteItem = async () => {
+    if (!selectedItem || !auth.currentUser) return;
+
+    Alert.alert(
+      "Delete Item",
+      "Are you sure you want to delete this item?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const itemRef = doc(db, 'users', auth.currentUser!.uid, 'closet', selectedItem.id);
+              await deleteDoc(itemRef);
+              setClothingItems(prevItems => prevItems.filter(item => item.id !== selectedItem.id));
+              setSelectedItem(null);
+              Alert.alert("Success", "Item deleted successfully");
+            } catch (error) {
+              console.error("Error deleting item:", error);
+              Alert.alert("Error", "Failed to delete item. Please try again.");
+            }
+          }
+        }
+      ]
+    );
   };
 
   const renderClothingItem = ({ item }: { item: ClothingItem }) => (
@@ -99,9 +127,61 @@ export default function ClosetScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
+      <View style={styles.logoContainer}>
+        <Text style={styles.logoText}>My</Text>
+        <Text style={[styles.logoText, styles.logoTextDrip]}>Closet</Text>
+      </View>
       <ScrollView style={styles.categoriesContainer}>
         {categories.map(renderCategory)}
       </ScrollView>
+      <Link href="/scan-modal" asChild>
+        <Pressable style={styles.cameraButton}>
+          <Ionicons name="camera" size={30} color="#FFB81C" />
+        </Pressable>
+      </Link>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={selectedItem !== null}
+        onRequestClose={() => setSelectedItem(null)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            {selectedItem && (
+              <>
+                {selectedItem.image && (
+                  <Image source={{ uri: selectedItem.image }} style={styles.modalImage} />
+                )}
+                <Text style={styles.modalTitle}>{selectedItem.name}</Text>
+                <Text style={styles.modalText}>Category: {selectedItem.category}</Text>
+                {selectedItem.description && (
+                  <Text style={styles.modalText}>Description: {selectedItem.description}</Text>
+                )}
+                {selectedItem.climate && (
+                  <Text style={styles.modalText}>Climate: {selectedItem.climate}</Text>
+                )}
+                {selectedItem.formality && (
+                  <Text style={styles.modalText}>Formality: {selectedItem.formality}</Text>
+                )}
+                <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => setSelectedItem(null)}
+                  >
+                    <Text style={styles.textStyle}>Close</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, styles.buttonDelete]}
+                    onPress={handleDeleteItem}
+                  >
+                    <Text style={styles.textStyle}>Delete</Text>
+                  </Pressable>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -109,22 +189,40 @@ export default function ClosetScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#f0f0f0',
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 30,
+    paddingBottom: 10,
+    backgroundColor: '#003594',
+  },
+  logoText: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#FFB81C',
+  },
+  logoTextDrip: {
+    color: '#FFFFFF',
+    marginLeft: 5,
   },
   categoriesContainer: {
     flex: 1,
+    padding: 20,
   },
   categoryContainer: {
     marginBottom: 20,
-    backgroundColor: '#003594',
-    padding: 10,
-    borderRadius: 15
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
   },
   categoryTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#FFB81C',
+    color: '#003594',
   },
   clothingItem: {
     width: 100,
@@ -141,12 +239,84 @@ const styles = StyleSheet.create({
   clothingItemPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
   },
   clothingItemText: {
     textAlign: 'center',
     padding: 5,
+  },
+  cameraButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#003594',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalImage: {
+    width: 300,
+    height: 300,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  button: {
+    justifyContent: 'center',
+    borderRadius: 20,
+    height: 50,
+    width: 100,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonClose: {
+    backgroundColor: '#003594',
+  },
+  buttonDelete: {
+    backgroundColor: '#FF0000',
+  },
+  textStyle: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

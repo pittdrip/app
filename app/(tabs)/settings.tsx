@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, Alert, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Alert, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
@@ -21,19 +21,25 @@ const Settings = () => {
 
     return (
         <View style={styles.container}>
-            {user && user.email && (
-                <View style={styles.emailContainer}>
-                    <Text style={styles.emailLabel}>Logged in as:</Text>
-                    <Text style={styles.emailText}>{user.email}</Text>
-                </View>
-            )}
+            <View style={styles.logoContainer}>
+                <Text style={styles.logoText}>My</Text>
+                <Text style={[styles.logoText, styles.logoTextDrip]}>Settings</Text>
+            </View>
+            <ScrollView style={styles.contentContainer}>
+                {user && user.email && (
+                    <View style={styles.emailContainer}>
+                        <Text style={styles.emailLabel}>Logged in as:</Text>
+                        <Text style={styles.emailText}>{user.email}</Text>
+                    </View>
+                )}
 
-            <Pressable onPress={handleSignOut} style={({ pressed }) => [
-                styles.button,
-                pressed && styles.pressedButton
-            ]}>
-                <Text style={styles.buttonText}>Log Out</Text>
-            </Pressable>
+                <Pressable onPress={handleSignOut} style={({ pressed }) => [
+                    styles.button,
+                    pressed && styles.pressedButton
+                ]}>
+                    <Text style={styles.buttonText}>Log Out</Text>
+                </Pressable>
+            </ScrollView>
         </View>
     );
 };
@@ -41,22 +47,35 @@ const Settings = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-        marginTop: 40,
+        backgroundColor: '#f0f0f0',
     },
-    pressedButton: {
-        opacity: .6
+    logoContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 30,
+        paddingBottom: 10,
+        backgroundColor: '#003594',
+    },
+    logoText: {
+        fontSize: 42,
+        fontWeight: 'bold',
+        color: '#FFB81C',
+    },
+    logoTextDrip: {
+        color: '#FFFFFF',
+        marginLeft: 5,
+    },
+    contentContainer: {
+        flex: 1,
+        padding: 20,
     },
     emailContainer: {
         alignItems: 'center',
         marginBottom: 20,
-        backgroundColor: '#f3f4f6',
-        paddingBottom: 15,
+        backgroundColor: '#fff',
+        padding: 20,
         borderRadius: 10,
-        width: '100%',
     },
     emailLabel: {
         fontSize: 16,
@@ -70,16 +89,18 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#003594',
-        padding: 10,
-        borderRadius: 5,
-        width: '100%',
+        padding: 15,
+        borderRadius: 10,
         alignItems: 'center',
         marginBottom: 10,
     },
+    pressedButton: {
+        opacity: 0.8
+    },
     buttonText: {
         color: '#FFB81C',
-        fontSize: 18,
-        fontWeight: '500'
+        fontSize: 22,
+        fontWeight: '800'
     },
 });
 
