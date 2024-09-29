@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getReactNativePersistence, initializeAuth } from 'firebase/auth'
@@ -6,17 +5,19 @@ import { getStorage } from "@firebase/storage"
 import { getVertexAI, getGenerativeModel } from "@firebase/vertexai-preview"
 import { getFirestore } from "@firebase/firestore"
 import { getFunctions } from "@firebase/functions"
+import Constants from 'expo-constants';
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAS77RaGZxisZelU3expwfY-lbzxrdqwVo",
-  authDomain: "pitt-drip.firebaseapp.com",
-  projectId: "pitt-drip",
-  storageBucket: "pitt-drip.appspot.com",
-  messagingSenderId: "766697609837",
-  appId: "1:766697609837:web:db597dde8113d3077e3d64"
+  apiKey: Constants.expoConfig?.extra?.firebaseApiKey,
+  authDomain: Constants.expoConfig?.extra?.firebaseAuthDomain,
+  projectId: Constants.expoConfig?.extra?.firebaseProjectId,
+  storageBucket: Constants.expoConfig?.extra?.firebaseStorageBucket,
+  messagingSenderId: Constants.expoConfig?.extra?.firebaseMessagingSenderId,
+  appId: Constants.expoConfig?.extra?.firebaseAppId
 };
 
-// Initialize Fisrebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth = initializeAuth(app, {

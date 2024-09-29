@@ -138,10 +138,10 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   selectedActivityItem: {
-    backgroundColor: 'green',
+    backgroundColor: '#003594',
   },
   selectedActivityText: {
-    color: 'white',
+    color: '#FFB81C',
     fontWeight: 'bold',
   },
   activityScroll: {
@@ -157,17 +157,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   pickOutfitButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#003594',
     padding: 15,
     height: 50,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 5,
     marginHorizontal: 10,
     marginBottom: 10,
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
+    color: '#FFB81C',
     fontSize: 18,
     fontWeight: 'bold',
   },

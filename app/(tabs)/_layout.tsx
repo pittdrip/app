@@ -33,6 +33,13 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="closet"
+        options={{
+          title: 'Closet',
+          tabBarIcon: ({ color }) => <TabBarIcon name="tshirt" color={color} />,
           headerRight: () => (
             <Link href="/scan-modal" asChild>
               <Pressable>
@@ -47,13 +54,6 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="closet"
-        options={{
-          title: 'Closet',
-          tabBarIcon: ({ color }) => <TabBarIcon name="tshirt" color={color} />
         }}
       />
       <Tabs.Screen
