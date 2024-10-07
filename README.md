@@ -1,56 +1,59 @@
-# Pitt Drip
+# PittDrip
 
-Simple overview of use/purpose.
+## Inspiration
 
-## Description
+The inspiration for PittDrip stems from a common dilemma: standing in front of a packed closet yet feeling like you have nothing to wear. In our fast-paced lives, deciding what to wear can become a stressful task, especially when considering the weather and planned activities. We wanted to create a solution that not only simplifies this process but also adds a layer of excitement and creativity to outfit selection. By harnessing the power of AI, PittDrip aims to be your ultimate closet buddy, transforming how you interact with your wardrobe.
 
-An in-depth paragraph about your project and overview of use.
+## What it does
 
-## Getting Started
+PittDrip is an innovative AI-driven closet assistant designed to help users curate and manage their clothing collections effortlessly. The app allows you to upload images of your garments, which are then automatically categorized into types, colors, and styles. But it doesn't stop there! PittDrip intelligently generates personalized outfit suggestions based on real-time weather conditions, specific activities, and your unique closet inventory. Whether you're dressing for a casual outing, a formal event, or a workout, PittDrip ensures you look your best while staying comfortable and stylish.
 
-### Dependencies
+## How we built it
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+We built PittDrip using a combination of cutting-edge technologies to deliver a smooth and engaging user experience:
 
-### Installing
+- Front-end: React Expo
+- AI Models: Gemini multimodal LLMs
+- Model Deployment: Replicate
+- Authentication and Storage: Firebase/Firestore
+- Weather Data: OpenWeatherMap API
+- Default Recommendation Model: Roc the Panther
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+## Challenges we ran into
 
-### Executing program
+1. CORS Issues: Debugging Cross-Origin Resource Sharing problems.
+2. Image Uploads: Difficulties in processing and categorizing images over HTTP.
+3. Chaining Models and APIs: Creating a cohesive workflow between multiple components.
+4. Devpost Mishap: Accidentally deleting our entire README on Devpost.
+5. API Key Leaks: Inadvertently exposing API keys during development.
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
+## Accomplishments that we're proud of
 
-## Help
+- Developed a functional prototype that accurately categorizes clothing items and generates stylish outfit recommendations.
+- Successfully integrated various technologies into a cohesive application.
+- Received positive feedback from initial users.
 
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+## What we learned
 
-## Authors
+- Insights into web development and secure coding practices.
+- Creative problem-solving for CORS and HTTP image upload challenges.
+- The importance of teamwork and communication in navigating setbacks and celebrating victories.
 
-Contributors names and contact info
+## What's next for PittDrip
 
-Rafayel Amirkhanyan, raa372@pitt.edu
+1. Enhanced Machine Learning Models
+2. User Profiles and Preferences
+3. Improved Security Measures
+4. Social Sharing Features
+5. E-commerce Integration
 
-Mark Bosco, mab688@pitt.edu
+Join us on this exciting journey to redefine the way you approach your wardrobe. With PittDrip, we're not just helping you choose outfits; we're empowering you to express your unique style with confidence!
 
-Gautam Udupa, gau2756@gmail.com
+## Built With
 
-
-## Version History
-
-
-
-## License
-
-
-
-## Acknowledgments
-
+- expo.io
+- firebase
+- gemini
+- node.js
+- react
+- replicate
